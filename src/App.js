@@ -17,9 +17,15 @@ const initialState = {
   email: "",
 };
 
+const initialErrorsState = {
+  fullName: "",
+  email: "",
+}
+
 function App() {
   const [formValues, setFormValues] = useState(initialState);
   const [disabled, setDisabled] = useState(true);
+  const [errors, setErrors] = useState(initialErrorsState);
 
   useEffect(() => {
     schema.isValid(formValues).then((valid) => {
@@ -34,11 +40,18 @@ function App() {
   };
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value } = event.target; // name="fullName", value="aa"
+
     setFormValues({
       ...formValues,
       [name]: value,
     });
+
+    yup
+      .reach(schema, name)
+      .validate(value)
+      .then(() => setErrors({ ...errors, [name]: ""})) // {email: "", fullName: ""} { fullName: 'something', email: "" }
+      .catch((err) => setErrors({ ...errors, [name]: err.errors[0]})); // {email: "", fullName: "Name is too short"} { fullName: 'Name is too short', email: "" }
   };
 
   return (
@@ -53,6 +66,7 @@ function App() {
             name="fullName"
           />
         </label>
+        {errors.fullName && <p style={{ color: "red" }}>{errors.fullName}</p>}
         <br />
         <label>
           Email:
@@ -63,6 +77,7 @@ function App() {
             name="email"
           />
         </label>
+        {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
         <div>
           <input disabled={disabled} type="submit" value="Submit" />
         </div>

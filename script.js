@@ -1,36 +1,19 @@
-// const otherKey = "address"
-
-// const myObject = {
-//     name: 'John',
-//     age: 'something else',
-//     [otherKey]: '123 Elm Street',
-// }
-
-// const newObject = {
-//     ...myObject,
-//     name: 'Jacob'
-// }
-
-// console.log(myObject);
-
-// console.log(newObject);
-
 const yup = require("yup");
 
 const schema = yup.object().shape({
   fullName: yup
-    .string()
-    .required()
+    .string("the value needs to be a string")
+    .required("Name is required")
     .min(2, "Name is too short")
-    .max(50, "Name is too long"),
-  email: yup.string().email("needs to be an email").required(),
+    .max(20, "Name is too long"),
+  email: yup
+    .string("the value needs to be a string")
+    .email("needs to be an email")
+    .required(),
 });
 
-const objectOne = {
-    fullName: "John",
-    email: "jacob@gmail.com"
-}
-
-schema.isValid(objectOne).then(res => console.log(res));
-
-schema.validate(objectOne).catch(err => console.log(err.errors));
+yup
+  .reach(schema, "fullName")
+  .validate("a")
+  .then(() => console.log("field is valid"))
+  .catch((err) => console.log(err.errors));
